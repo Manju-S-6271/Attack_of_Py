@@ -1,19 +1,65 @@
 # 初期化
 import random
 import os
+import platform
 import inquirer
 import pprint
 
-os.system("title ATTACK OF PY")
-os.system("cls")
-level_power = {
-    # ["プレイヤーのHP", "プレイヤーの最小攻撃力", "プレイヤーの最大攻撃力", "プレイヤーのMP", "敵の名前", "敵のHP", "敵の最小攻撃力", "敵の最大攻撃力"]
-    "Easy": [100, 20, 25, 100, "スライム", 80, 20, 25],
-    "Normal": [150, 25, 30, 150, "エアーマン", 120, 30, 35],
-    "Hard": [200, 50, 60, 200, "竜王", 300, 40, 50], 
-    "SAORI": [1000, 100, 120, 500, "サオリ・ヨシダ", 9999, 9999, 9999]
-}
+# デバッグモード
+class debug:
+    enabled = False
+    if enabled == True:
+        # デバッグ追加モジュール
+        # OSチェックをスキップ
+        oscheck_bypass_enabled = True
+        # 設定後の内容表示モード (内容表示後に終了)
+        show_setting_mode_enabled = True
 
+# OS関係
+class os_command:
+    os_name = platform.system()
+
+    def os_check():
+        # OS名 [Windows / MacOS / etc] を取得
+        os_name = platform.system()
+
+        # OSがネイティブサポートされていないOSの場合は確認
+        native_support_os = ["Windows", "Darwin"]
+        if os_name not in native_support_os and oscheck_bypass == False:
+            print("ご利用のOS(" + os_name + ")はネイティブサポートされていません。")
+            print("ネイティブサポートされていないOSでの動作は保証されません。")
+            print("また、一部の機能は制限されます。")
+            inquirer.confirm("続行しますか？", default=True)
+            if not inquirer.prompt:
+                exit()
+        return os_name
+    
+    def clear():
+        # OS名 [Windows / MacOS / etc] を取得
+        os_name = platform.system()
+
+        if os_name == "Windows":
+            os.system("cls")
+        elif os_name == "Darwin":
+            os.system("clear")
+        else:
+            print("\n" * 100)
+
+    def title(text):
+        # OS名 [Windows / MacOS / etc] を取得
+        os_name = platform.system()
+
+        if os_name == "Windows":
+            os.system("title " + text)
+        elif os_name == "Darwin":
+            os.system(f'echo -ne "\\033]0;{text}\\007"')
+        else:
+            print("[" + text + "]")
+
+if os_command.os_name == "Windows":
+    os.system("chcp 65001")
+
+os_command.title("Attack of Python")
 
 # レベル選択
 questions = [
@@ -33,9 +79,7 @@ player_select = inquirer.prompt(questions)
 player_name = player_select['Player']
 player_hp, player_min_attack, player_max_attack, player_mp, enemy_name, enemy_hp, enemy_min_attack, enemy_max_attack = level_power[player_select['Level']]
 
-# debug: 全ての変数を表示
-debug = False
-if debug == True:
+if debug.show_setting_mode_enabled == True:
     print("player_name: ", player_name)
     print("player_hp: ", player_hp)
     print("player_min_attack: ", player_min_attack)
@@ -45,6 +89,7 @@ if debug == True:
     print("enemy_hp: ", enemy_hp)
     print("enemy_min_attack: ", enemy_min_attack)
     print("enemy_max_attack: ", enemy_max_attack)
+    print("os_name: ", os_command.os_name)
     exit()
     
 # バトル
