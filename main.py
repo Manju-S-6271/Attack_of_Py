@@ -3,7 +3,6 @@ import random
 import os
 import platform
 import inquirer
-import pprint
 
 # デバッグモード
 class debug:
