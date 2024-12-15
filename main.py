@@ -23,6 +23,16 @@ class os_command:
     os_name = platform.system()
 
     @classmethod
+    def run(cls, command):
+        # OS名 [Windows / MacOS / etc] を取得
+        os_name = cls.os_name
+        
+        if os_name in ["Windows", "Darwin"]:
+            os.system(command)
+        else:
+            print("[Ran:" + command + "]")
+
+    @classmethod
     def os_check(cls):
         # OS名 [Windows / MacOS / etc] を取得
         os_name = cls.os_name
@@ -50,7 +60,8 @@ class os_command:
             print("\n" * 100)
 
     @classmethod
-    def title(cls, text):
+    def title(cls, text, darwin_clear=False):
+        # darwin_clear: MacOSの場合、タイトル設定後にクリアするかどうか (Falseだと、-neが残るため)
         # OS名 [Windows / MacOS / etc] を取得
         os_name = cls.os_name
 
@@ -58,6 +69,8 @@ class os_command:
             os.system("title " + text)
         elif os_name == "Darwin":
             os.system(f'echo -ne "\\033]0;{text}\\007"')
+            if darwin_clear:
+                os.system("clear")
         else:
             print("[" + text + "]")
 
@@ -87,10 +100,13 @@ class character:
 
 # Windowsの場合のみ文字化け対策(文字コードをUTF-8に変更)
 if os_command.os_name == "Windows":
-    os.system("chcp 65001")
+    os_command.run("echo off")
+    os_command.run("chcp 65001")
+    os_command.clear()
+
 
 # タイトル設定
-os_command.title("Attack of Python")
+os_command.title("Attack of Python", True)
 
 # キャラクター設定
 player_select = inquirer.prompt(character.settings)
