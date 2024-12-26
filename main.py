@@ -74,6 +74,36 @@ class os_command:
         else:
             print("[" + text + "]")
 
+# バトル制御関係
+class battle:
+    # バトル枠の表示個数計算
+    def battle_frame_count(player_name, enemy_name):
+        # 名前の字数を取得
+        player_name_count = len(player_name)
+        enemy_name_count = len(enemy_name)
+
+        # 多い方の字数と20(各種数値の表示枠分)を取得
+        frame_count = max(player_name_count, enemy_name_count) + 20
+
+        # 字数が多い方がどっちかを演算
+        if player_name_count > enemy_name_count:
+            bigger_name = "player"
+            diff = player_name_count - enemy_name_count
+        else:
+            bigger_name = "enemy"
+            diff = enemy_name_count - player_name_count
+        
+        # frame_count, bigger_name, diffを
+        returns = [frame_count, bigger_name, diff]
+
+        return returns
+    
+    # バトル枠の表示
+    def battle_frame(battle_data, battle_frame_data):
+        # バトル枠の表示
+        print("+" + "-" * battle_frame_data[0] + "+")
+
+
 # キャラクター関係
 class character:
     # 初期キャラクター設定
@@ -129,4 +159,4 @@ if debug.enabled and debug.show_setting_mode_enabled:
     print("os_name: ", os_command.os_name)
     exit()
     
-# バトル
+# バトル枠
