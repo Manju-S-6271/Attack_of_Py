@@ -68,7 +68,7 @@ class os_command:
         if os_name == "Windows":
             os.system("title " + text)
         elif os_name == "Darwin":
-            os.system(f'echo -ne "\\033]0;{text}\\007"')
+            os.system(f'printf "\\033]0;{text}\\007"')
             if darwin_clear:
                 os.system("clear")
         else:
@@ -84,6 +84,14 @@ class battle:
 
         # 多い方の字数と20(各種数値の表示枠分)を取得
         frame_count = max(player_name_count, enemy_name_count) + 20
+
+        # Player + "Easy"(100, 20, 25, 100, "Slime", 80, 20, 25)の時
+        # +--------------------+
+        # | NAME   HP  ATK MP  |
+        # | Player 100 25  100 | 
+        # | Slime  80  ??  25  |
+        # +--------------------+
+        # (ATKは最大のみ表示, 敵ATKは??で表示, 名前はPlayerとSlimeのどちらかが多い方に合わせる)
 
         # 字数が多い方がどっちかを演算
         if player_name_count > enemy_name_count:
@@ -101,8 +109,8 @@ class battle:
     # バトル枠の表示
     def battle_frame(battle_data, battle_frame_data):
         # バトル枠の表示
-        print("+" + "-" * battle_frame_data[0] + "+")
-
+        print(f"+{'-' * battle_frame_data[0]}+")
+        print(f"| ")
 
 # キャラクター関係
 class character:
@@ -110,7 +118,7 @@ class character:
     settings = [
         inquirer.Text(
             "Player", 
-            message="プレイヤーの名前を入力してください"
+            message="プレイヤーの名前を入力してください（英語のみ）"
         ),
         inquirer.List(
             "Level",
@@ -122,10 +130,10 @@ class character:
     # レベルごとのパラメータ
     level_power = {
         # ["プレイヤーのHP", "プレイヤーの最小攻撃力", "プレイヤーの最大攻撃力", "プレイヤーのMP", "敵の名前", "敵のHP", "敵の最小攻撃力", "敵の最大攻撃力"]
-        "Easy": [100, 20, 25, 100, "スライム", 80, 20, 25],
-        "Normal": [150, 25, 30, 150, "エアーマン", 120, 30, 35],
-        "Hard": [200, 50, 60, 200, "竜王", 300, 40, 50], 
-        "SAORI": [1000, 100, 120, 500, "サオリ・ヨシダ", 9999, 9999, 9999]
+        "Easy": [100, 20, 25, 100, "Slime", 80, 20, 25],
+        "Normal": [150, 25, 30, 150, "Air Man", 120, 30, 35],
+        "Hard": [200, 50, 60, 200, "Dragonlord", 300, 40, 50], 
+        "SAORI": [1000, 100, 120, 500, "SAORI YOSHIDA", 9999, 9999, 9999]
     }
 
 # Windowsの場合のみ文字化け対策(文字コードをUTF-8に変更)
@@ -136,7 +144,7 @@ if os_command.os_name == "Windows":
 
 
 # タイトル設定
-os_command.title("Attack of Python", True)
+os_command.title("Attack of Python")
 
 # キャラクター設定
 player_select = inquirer.prompt(character.settings)
@@ -144,6 +152,7 @@ player_select = inquirer.prompt(character.settings)
 # プレイヤーの名前・パラメータを取得
 player_name = player_select['Player']
 player_hp, player_min_attack, player_max_attack, player_mp, enemy_name, enemy_hp, enemy_min_attack, enemy_max_attack = character.level_power[player_select['Level']]
+battle_data = [player_name, player_hp, player_min_attack, player_max_attack, player_mp, enemy_name, enemy_hp, enemy_min_attack, enemy_max_attack]
 
 # もしデバッグモード・設定表示モードが有効ならすべての変数を表示・終了
 if debug.enabled and debug.show_setting_mode_enabled:
@@ -160,3 +169,7 @@ if debug.enabled and debug.show_setting_mode_enabled:
     exit()
     
 # バトル枠
+while True:
+    battle_frame_data = battle.battle_frame_count(player_name, enemy_name)
+    battle.battle_frame(battle_data, battle_frame_data)
+    break
