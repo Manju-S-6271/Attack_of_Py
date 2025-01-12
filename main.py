@@ -87,10 +87,10 @@ class battle:
 
         # Player + "Easy"(100, 20, 25, 100, "Slime", 80, 20, 25)の時
         # +--------------------+
-        # | NAME   HP  ATK MP  |
-        # | Player 100 25  100 | 
-        # | Slime  80  ??  25  |
-        # +--------------------+
+        # | NAME   HP  ATK MP  | (下の計算により、プレイヤー字数の方が1字多いことがわかるため、出力は[20, "Player", 1]となる。)
+        # | Player 100 025 100 | (この場合、プレイヤー名(6)+定数(14)=20)
+        # | Slime  080 ??? ??? | (この場合、敵名(5)+定数(14)=19)
+        # +--------------------+ (20-19=1)
         # (ATKは最大のみ表示, 敵ATKは??で表示, 名前はPlayerとSlimeのどちらかが多い方に合わせる)
 
         # 字数が多い方がどっちかを演算
@@ -107,10 +107,20 @@ class battle:
         return returns
     
     # バトル枠の表示
-    def battle_frame(battle_data, battle_frame_data):
-        # バトル枠の表示
-        print(f"+{'-' * battle_frame_data[0]}+")
-        print(f"| ")
+    def battle_frame(battle_public_data, battle_frame_data):
+        # すべてを個別に変数化
+        player_name, player_hp, player_min_attack, player_mp, enemy_name, enemy_hp = battle_public_data
+        frame_count, bigger_name, diff = battle_frame_data
+
+        # プレイヤー名もしくは敵名に空白(字数が多い方は1つ・字数が少ない方は1+diffつ)を追加
+        if player_name == bigger_name:
+            s_player_name = f"{player_name} "
+            s_enemy_name = f"{enemy_name}{" " * (1 + diff)}"
+        else:
+            s_ #次ここから 上のやつ見ればわかる
+
+        # 各種数字を3桁化し、1空白を追加する。
+        # ただし、4桁の場合は、そのまま表示する。
 
 # キャラクター関係
 class character:
@@ -129,11 +139,11 @@ class character:
     
     # レベルごとのパラメータ
     level_power = {
-        # ["プレイヤーのHP", "プレイヤーの最小攻撃力", "プレイヤーの最大攻撃力", "プレイヤーのMP", "敵の名前", "敵のHP", "敵の最小攻撃力", "敵の最大攻撃力"]
-        "Easy": [100, 20, 25, 100, "Slime", 80, 20, 25],
-        "Normal": [150, 25, 30, 150, "Air Man", 120, 30, 35],
-        "Hard": [200, 50, 60, 200, "Dragonlord", 300, 40, 50], 
-        "SAORI": [1000, 100, 120, 500, "SAORI YOSHIDA", 9999, 9999, 9999]
+        # ["プレイヤーのHP", "プレイヤーの最小攻撃力", "プレイヤーの最大攻撃力", "プレイヤーのMP", "敵の名前", "敵のHP", "敵の最小攻撃力", "敵の最大攻撃力", "敵のMP"]
+        "Easy": [100, 20, 25, 100, "Slime", 80, 20, 25, 100],
+        "Normal": [150, 25, 30, 150, "Air Man", 120, 30, 35, 100],
+        "Hard": [200, 50, 60, 200, "Dragonlord", 300, 40, 50, 400], 
+        "SAORI": [1000, 100, 120, 500, "SAORI YOSHIDA", 9999, 9999, 9999, 0]
     }
 
 # Windowsの場合のみ文字化け対策(文字コードをUTF-8に変更)
@@ -153,6 +163,7 @@ player_select = inquirer.prompt(character.settings)
 player_name = player_select['Player']
 player_hp, player_min_attack, player_max_attack, player_mp, enemy_name, enemy_hp, enemy_min_attack, enemy_max_attack = character.level_power[player_select['Level']]
 battle_data = [player_name, player_hp, player_min_attack, player_max_attack, player_mp, enemy_name, enemy_hp, enemy_min_attack, enemy_max_attack]
+battle_public_data = [player_name, player_hp, player_min_attack, player_mp, enemy_name, enemy_hp]
 
 # もしデバッグモード・設定表示モードが有効ならすべての変数を表示・終了
 if debug.enabled and debug.show_setting_mode_enabled:
@@ -171,5 +182,5 @@ if debug.enabled and debug.show_setting_mode_enabled:
 # バトル枠
 while True:
     battle_frame_data = battle.battle_frame_count(player_name, enemy_name)
-    battle.battle_frame(battle_data, battle_frame_data)
+    battle.battle_frame(battle_public_data, battle_frame_data)
     break
