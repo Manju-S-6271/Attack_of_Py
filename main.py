@@ -86,11 +86,11 @@ class battle:
         frame_count = max(player_name_count, enemy_name_count) + 20
 
         # Player + "Easy"(100, 20, 25, 100, "Slime", 80, 20, 25)の時
-        # +--------------------+
-        # | NAME   HP  ATK MP  | (下の計算により、プレイヤー字数の方が1字多いことがわかるため、出力は[20, "Player", 1]となる。)
-        # | Player 100 025 100 | (この場合、プレイヤー名(6)+定数(14)=20)
-        # | Slime  080 ??? ??? | (この場合、敵名(5)+定数(14)=19)
-        # +--------------------+ (20-19=1)
+        # +-----------------------+
+        # | NAME   HP   ATK  MP   | (下の計算により、プレイヤー字数の方が1字多いことがわかるため、出力は[25, "Player", 1]となる。)
+        # | Player 100  025  100  | (この場合、プレイヤー名(6)+定数(19)=25)
+        # | Slime  080  ???  ???  | (この場合、敵名(5)+定数(19)=24)
+        # +-----------------------+ (25-24=1)
         # (ATKは最大のみ表示, 敵ATKは??で表示, 名前はPlayerとSlimeのどちらかが多い方に合わせる)
 
         # 字数が多い方がどっちかを演算
@@ -112,15 +112,37 @@ class battle:
         player_name, player_hp, player_min_attack, player_mp, enemy_name, enemy_hp = battle_public_data
         frame_count, bigger_name, diff = battle_frame_data
 
-        # プレイヤー名もしくは敵名に空白(字数が多い方は1つ・字数が少ない方は1+diffつ)を追加
-        if player_name == bigger_name:
-            s_player_name = f"{player_name} "
-            s_enemy_name = f"{enemy_name}{" " * (1 + diff)}"
+        # プレイヤー名もしくは敵名に空白(字数が多い方は1つ・字数が少ない方は1+diffつ)を追加・bigger_nameの文字数を取得
+        if "player" == bigger_name:
+            s_player_name = f"{player_name}"  # ここでdiffを適用しない
+            s_enemy_name = f"{enemy_name}{" " * (diff + 1)}"
+            v_bigger_name = len(player_name) + diff  # プレイヤー側の枠も考慮
         else:
-            s_ #次ここから 上のやつ見ればわかる
+            s_player_name = f"{player_name}{" " * diff}"
+            s_enemy_name = f"{enemy_name}"
+            v_bigger_name = len(enemy_name)
 
-        # 各種数字を3桁化し、1空白を追加する。
+        # 次回はここらへん
+        a = c
+        # 各種数字を3桁化(1 → 001)し、1空白を追加する。
         # ただし、4桁の場合は、そのまま表示する。
+        s_player_hp = f"{player_hp:03}"
+        s_player_min_attack = f"{player_min_attack:03}"
+        s_player_mp = f"{player_mp:03}"
+        s_enemy_hp = f"{enemy_hp:03}"
+
+        # バトル枠の表示・枠上部
+        print("+" + "-" * (frame_count - 2) + "+")
+        # バトル枠の表示・ヘッダー部(| Name[空白 * (v_bigger_name - 3)]HP  ATK MP  |)
+        print(f"| Name{' ' * (v_bigger_name - 3)}HP   ATK   MP   |")  # "Name" の部分を動的に調整
+        # バトル枠の表示・プレイヤー部(| Player[空白 * (v_bigger_name - 6)]100  025  100 |)
+        print(f"| {s_player_name} {s_player_hp} {s_player_min_attack} {s_player_mp} |")
+        # バトル枠の表示・敵部(| Slime[空白 * (v_bigger_name - 5)]080  ???  ??? |)
+        print(f"| {s_enemy_name} {s_enemy_hp} ???  ??? |")
+        # バトル枠の表示・枠下部
+        print("+" + "-" * (frame_count - 2) + "+")
+
+
 
 # キャラクター関係
 class character:
@@ -161,8 +183,8 @@ player_select = inquirer.prompt(character.settings)
 
 # プレイヤーの名前・パラメータを取得
 player_name = player_select['Player']
-player_hp, player_min_attack, player_max_attack, player_mp, enemy_name, enemy_hp, enemy_min_attack, enemy_max_attack = character.level_power[player_select['Level']]
-battle_data = [player_name, player_hp, player_min_attack, player_max_attack, player_mp, enemy_name, enemy_hp, enemy_min_attack, enemy_max_attack]
+player_hp, player_min_attack, player_max_attack, player_mp, enemy_name, enemy_hp, enemy_min_attack, enemy_max_attack, enemy_mp = character.level_power[player_select['Level']]
+battle_data = [player_name, player_hp, player_min_attack, player_max_attack, player_mp, enemy_name, enemy_hp, enemy_min_attack, enemy_max_attack, enemy_mp]
 battle_public_data = [player_name, player_hp, player_min_attack, player_mp, enemy_name, enemy_hp]
 
 # もしデバッグモード・設定表示モードが有効ならすべての変数を表示・終了
@@ -176,8 +198,8 @@ if debug.enabled and debug.show_setting_mode_enabled:
     print("enemy_hp: ", enemy_hp)
     print("enemy_min_attack: ", enemy_min_attack)
     print("enemy_max_attack: ", enemy_max_attack)
+    print("enemy_mp: ", enemy_mp)
     print("os_name: ", os_command.os_name)
-    exit()
     
 # バトル枠
 while True:
