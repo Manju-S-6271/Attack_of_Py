@@ -123,7 +123,7 @@ class battle:
             v_bigger_name = len(enemy_name)
 
         # 次回はここらへん
-        a = c
+        something()
         # 各種数字を3桁化(1 → 001)し、1空白を追加する。
         # ただし、4桁の場合は、そのまま表示する。
         s_player_hp = f"{player_hp:03}"
