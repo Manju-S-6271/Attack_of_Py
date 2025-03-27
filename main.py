@@ -3,6 +3,7 @@ import random
 import os
 import platform
 import inquirer
+import pygame
 
 # デバッグモード
 class debug:
@@ -112,37 +113,23 @@ class battle:
         player_name, player_hp, player_min_attack, player_mp, enemy_name, enemy_hp = battle_public_data
         frame_count, bigger_name, diff = battle_frame_data
 
-        # プレイヤー名もしくは敵名に空白(字数が多い方は1つ・字数が少ない方は1+diffつ)を追加・bigger_nameの文字数を取得
-        if "player" == bigger_name:
-            s_player_name = f"{player_name}"  # ここでdiffを適用しない
-            s_enemy_name = f"{enemy_name}{" " * (diff + 1)}"
-            v_bigger_name = len(player_name) + diff  # プレイヤー側の枠も考慮
-        else:
-            s_player_name = f"{player_name}{" " * diff}"
-            s_enemy_name = f"{enemy_name}"
-            v_bigger_name = len(enemy_name)
+        # プレイヤー名もしくは敵名に空白を追加
+        s_player_name = f"{player_name}{' ' * diff}" if bigger_name == "enemy" else player_name
+        s_enemy_name = f"{enemy_name}{' ' * diff}" if bigger_name == "player" else enemy_name
+        v_bigger_name = max(len(player_name), len(enemy_name))
 
-        # 次回はここらへん
-        something()
-        # 各種数字を3桁化(1 → 001)し、1空白を追加する。
-        # ただし、4桁の場合は、そのまま表示する。
-        s_player_hp = f"{player_hp:03}"
+        # 各種数字を3桁化し、1空白を追加する (HP4桁の場合はそのまま表示)
+        s_player_hp = f"{player_hp:03} " if len(str(player_hp)) != 4 else str(player_hp)
+        s_enemy_hp = f"{enemy_hp:03} " if len(str(enemy_hp)) != 4 else str(enemy_hp)
         s_player_min_attack = f"{player_min_attack:03}"
         s_player_mp = f"{player_mp:03}"
-        s_enemy_hp = f"{enemy_hp:03}"
 
-        # バトル枠の表示・枠上部
-        print("+" + "-" * (frame_count - 2) + "+")
-        # バトル枠の表示・ヘッダー部(| Name[空白 * (v_bigger_name - 3)]HP  ATK MP  |)
-        print(f"| Name{' ' * (v_bigger_name - 3)}HP   ATK   MP   |")  # "Name" の部分を動的に調整
-        # バトル枠の表示・プレイヤー部(| Player[空白 * (v_bigger_name - 6)]100  025  100 |)
-        print(f"| {s_player_name} {s_player_hp} {s_player_min_attack} {s_player_mp} |")
-        # バトル枠の表示・敵部(| Slime[空白 * (v_bigger_name - 5)]080  ???  ??? |)
-        print(f"| {s_enemy_name} {s_enemy_hp} ???  ??? |")
-        # バトル枠の表示・枠下部
-        print("+" + "-" * (frame_count - 2) + "+")
-
-
+        # バトル枠の表示
+        print(f"+{'-' * (frame_count - 2)}+")
+        print(f"| Name{' ' * (v_bigger_name - 3)}HP   ATK   MP   |")
+        print(f"| {s_player_name} {s_player_hp} {s_player_min_attack}   {s_player_mp}  |")
+        print(f"| {s_enemy_name} {s_enemy_hp} ???   ???  |")
+        print(f"+{'-' * (frame_count - 2)}+")
 
 # キャラクター関係
 class character:
@@ -150,11 +137,11 @@ class character:
     settings = [
         inquirer.Text(
             "Player", 
-            message="プレイヤーの名前を入力してください（英語のみ）"
+            message="Enter your name (English Only)",
         ),
         inquirer.List(
             "Level",
-            message="レベルを選択してください",
+            message="Select the level",
             choices=["Easy", "Normal", "Hard", "SAORI"],
         ),
     ]
@@ -167,6 +154,21 @@ class character:
         "Hard": [200, 50, 60, 200, "Dragonlord", 300, 40, 50, 400], 
         "SAORI": [1000, 100, 120, 500, "SAORI YOSHIDA", 9999, 9999, 9999, 0]
     }
+
+# 音楽関係
+class music:
+    wily = "/Users/manju/Documents/GitHub/Attack_of_Py/Wily_Stage_1_BGM.wav"
+
+    def initialize(music_path):
+        pygame.mixer.init()
+        pygame.mixer.music.load(music_path)
+
+    @classmethod
+    def play_bgm(self, music_name):
+        if music_name == "wily":
+            music.initialize(self.wily)
+            pygame.mixer.music.play(loops=-1)
+    
 
 # Windowsの場合のみ文字化け対策(文字コードをUTF-8に変更)
 if os_command.os_name == "Windows":
@@ -203,6 +205,8 @@ if debug.enabled and debug.show_setting_mode_enabled:
     
 # バトル枠
 while True:
+    BGM_instance = music.play_bgm("wily")
     battle_frame_data = battle.battle_frame_count(player_name, enemy_name)
     battle.battle_frame(battle_public_data, battle_frame_data)
+    inquirer.confirm("Press Enter to continue", default=True)
     break
