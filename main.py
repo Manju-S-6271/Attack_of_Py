@@ -242,56 +242,61 @@ class battle:
             )
 
         return choice
-    
-    def battle_player_attack(battle_data:dict):
-        """バトルの攻撃を行う関数
-        Args:
-            battle_data (dict): バトルデータ
-        
-        Returns:
-            battle_data (dict): 攻撃後のバトルデータ
-        """
 
-        # 攻撃の宣誓
-        print(f"{battle_data['player']} is attacking {battle_data['enemy_name']}...")
+    class battle_attack:
+            def player(battle_data:dict) -> str:
+                """攻撃を行う関数
+                Args:
+                    battle_data (dict): バトルデータ
+                
+                Returns:
+                    battle_data (dict): 攻撃後のバトルデータ
+                """
 
-        # プレイヤーの攻撃力をランダムに決定
-        attack_power = random.randint(battle_data["player_min_attack"], battle_data["player_max_attack"])
-        successed = random.randint(0, 100)
-        critical_hit = random.randint(0, 100)
+                # 攻撃の宣誓
+                print(f"{battle_data['player']} is attacking {battle_data['enemy_name']}...")
 
-        # 攻撃が成功した場合
-        if successed != 1:
-            # 攻撃力をランダムに決定
-            attack_power = random.randint(battle_data["player_min_attack"], battle_data["player_max_attack"])
-        else:
-            # 攻撃が失敗した場合
-            attack_power = 0
-            print("Attack missed!")
-            return battle_data
-        
-        # 敵のHPを減少
-        battle_data["enemy_hp"] -= attack_power
+                # プレイヤーの攻撃力をランダムに決定
+                attack_power = random.randint(battle_data["player_min_attack"], battle_data["player_max_attack"])
+                successed = random.randint(0, 100)
+                critical_hit = random.randint(0, 100)
+
+                # 攻撃が成功した場合
+                if successed != 1:
+                    # 攻撃力をランダムに決定
+                    attack_power = random.randint(battle_data["player_min_attack"], battle_data["player_max_attack"])
+                else:
+                    # 攻撃が失敗した場合
+                    attack_power = 0
+                    print("Attack missed!")
+                    return battle_data
+                
+                # 敵のHPを減少
+                battle_data["enemy_hp"] -= attack_power
 
 
-        if critical_hit <= 90:
-            print(f"{battle_data['player']} attacked {battle_data['enemy_name']} for {attack_power} damage!")
-        else:
-            # クリティカルヒット
-            attack_power *= 1.5
-            print(f"Critical Hit! {battle_data['player']} attacked {battle_data['enemy_name']} for {attack_power} damage!")
+                if critical_hit <= 90:
+                    print(f"{battle_data['player']} attacked {battle_data['enemy_name']} for {attack_power} damage!")
+                else:
+                    # クリティカルヒット
+                    attack_power *= 1.5
+                    print(f"Critical Hit! {battle_data['player']} attacked {battle_data['enemy_name']} for {attack_power} damage!")
 
-        # 敵のHPが0以下になった場合
-        if battle_data["enemy_hp"] <= 0:
-            print(f"{battle_data['enemy_name']} has been defeated!")
-            # 敵のHPを0にする
-            battle_data["enemy_hp"] = 0
-            # 戦闘終了
-            inquirer.confirm("Press Enter to continue...")
-            # 終了
-            exit()
+                # 敵のHPが0以下になった場合
+                if battle_data["enemy_hp"] <= 0:
+                    print(f"{battle_data['enemy_name']} has been defeated!")
+                    # 敵のHPを0にする
+                    battle_data["enemy_hp"] = 0
+                    # 戦闘終了
+                    inquirer.confirm("Press Enter to continue...")
+                    # 終了
+                    exit()
 
-        return battle_data
+                return battle_data
+            
+            def enemy(battle_data:dict) -> dict:
+                
+
 
 # キャラクター関係
 class character:
